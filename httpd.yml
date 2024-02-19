@@ -1,0 +1,43 @@
+---
+- name: WebServer Project
+  gather_facts: no
+  hosts: nodes
+  become: true
+  tasks:
+    - name: Install Required Packages
+      yum:
+        name:
+          - httpd
+          - firewalld
+        state: present
+    - name: Enable httpd Service
+      service:
+        name: httpd
+        enabled: yes
+        state: started
+    - name: Enable firewalld Service
+      service:
+        name: firewalld
+        enabled: yes
+        state: started
+    - name: Create index File
+      copy:
+        content: welcome to my website
+        dest: /var/www/html/index.html
+        mode: 644
+    - name: Allow http Port in Firewall
+      firewalld:
+        service: http
+        permanent: yes
+        state: enabled
+        immediate: yes
+- name: Test the Website
+  gather_facts: no
+  hosts: nodes
+  become: true
+  tasks:
+    - name: Check Website Availability
+      uri:
+        url: http://192.168.159.130
+        status_code: 200
+        return_content: yes
