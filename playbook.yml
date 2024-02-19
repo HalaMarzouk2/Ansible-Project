@@ -1,0 +1,32 @@
+---
+- name: Manage users, files, and permissions
+  hosts: web
+  become: yes
+  tasks:
+    - name: Create user
+      user:
+        name: Hala_iti
+        state: present
+    - name: Add permission to file
+      file:
+        path: /home/ansible_user/file1
+        mode: "0644"
+    - name: Create file
+      file:
+        path: /home/ansible_user/file2
+        state: touch
+    - name: Delete file
+      file:
+        path: /home/ansible_user/file2
+        state: absent
+    - name: Create .sh file containing command
+      copy:
+        content: |
+          #!/bin/bash
+          tail -n1 /etc/passwd
+        dest: /home/ansible_user/script.sh
+        mode: "755"
+    - name: Start HTTPD service
+      service:
+        name: httpd
+        state: started
